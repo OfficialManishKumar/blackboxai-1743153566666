@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n8n Workflow Editor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'n8n-blue': '#00c9b7',
+            'n8n-dark': '#2c3e50',
+            'n8n-light': '#f8f9fa',
+            'n8n-accent': '#ff6b6b',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .node {
+      min-width: 240px;
+      border-left: 4px solid var(--node-color);
+    }
+    .connection-path {
+      stroke: #00c9b7;
+      stroke-width: 2;
+      fill: none;
+      marker-end: url(#arrowhead);
+    }
+  </style>
+</head>
+<body class="bg-n8n-light text-gray-800">
+  <div id="app" class="flex h-screen overflow-hidden">
+    <!-- Sidebar Navigation -->
+    <div class="w-16 bg-n8n-dark text-white flex flex-col items-center py-4">
+      <div class="text-2xl font-bold text-n8n-blue mb-8">n8n</div>
+      <nav class="flex-1 space-y-6">
+        <button class="p-2 rounded-lg hover:bg-gray-700 text-white">
+          <i class="fas fa-project-diagram text-xl"></i>
+        </button>
+        <button class="p-2 rounded-lg hover:bg-gray-700 text-white">
+          <i class="fas fa-cog text-xl"></i>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Top Bar -->
+      <header class="h-16 border-b bg-white flex items-center px-4 justify-between">
+        <div class="flex items-center space-x-4">
+          <h1 class="text-xl font-semibold">Workflow Editor</h1>
+        </div>
+        <div class="flex space-x-2">
+          <button class="px-4 py-2 bg-n8n-blue text-white rounded hover:bg-blue-600 flex items-center">
+            <i class="fas fa-play mr-2"></i> Execute
+          </button>
+        </div>
+      </header>
+
+      <!-- Workflow Area -->
+      <div class="flex-1 flex overflow-hidden">
+        <!-- Node Palette -->
+        <div class="w-64 border-r bg-white p-4 overflow-y-auto">
+          <h2 class="font-medium mb-4">Nodes</h2>
+          <div class="space-y-2">
+            <div class="node p-3 bg-white rounded shadow cursor-move" draggable="true" data-node-type="httpRequest">
+              <div class="flex items-center">
+                <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mr-2">
+                  <i class="fas fa-globe text-blue-500 text-sm"></i>
+                </div>
+                <span>HTTP Request</span>
+              </div>
+            </div>
+            <!-- More nodes would be added here -->
+          </div>
+        </div>
+
+        <!-- Workflow Canvas -->
+        <div class="flex-1 relative overflow-auto bg-gray-50" id="workflow-canvas">
+          <svg class="absolute top-0 left-0 w-full h-full pointer-events-none" id="connection-layer">
+            <defs>
+              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#00c9b7"/>
+              </marker>
+            </defs>
+          </svg>
+          <!-- Nodes will be rendered here by editor.js -->
+        </div>
+
+        <!-- Node Properties Panel -->
+        <div class="w-80 border-l bg-white p-4 overflow-y-auto">
+          <h2 class="font-medium mb-4">Node Properties</h2>
+          <div id="node-properties">
+            <!-- Properties will be loaded here when a node is selected -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/editor.js"></script>
+  <script>
+    const { createApp } = Vue;
+    
+    createApp({
+      data() {
+        return {
+          workflowEngine: null
+        }
+      },
+      mounted() {
+        this.workflowEngine = new WorkflowEditor({
+          canvas: document.getElementById('workflow-canvas'),
+          connectionLayer: document.getElementById('connection-layer'),
+          propertiesPanel: document.getElementById('node-properties')
+        });
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
